@@ -132,6 +132,7 @@ router.post("/join", async (req, res) => {
     groups.push(GroupID);
     await joinsRef.doc(UserID).set(groups);
 
+    res.send({Status: true});
   } catch (err) {
     console.log(err);
     res.status(503);
@@ -139,7 +140,18 @@ router.post("/join", async (req, res) => {
   }
 });
 
-router.delete("/", async (req, res) => {});
+router.delete("/", async (req, res) => {
+    try {
+        const {GroupID} = req.params;
+
+        await groupsRef.doc(GroupID).delete();
+        res.send({Status: true});
+    } catch(err) {
+        console.log(err);
+        res.status(503);
+        res.send(err);
+    }
+});
 
 router.get("/", async (req, res) => {});
 

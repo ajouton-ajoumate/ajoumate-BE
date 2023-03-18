@@ -11,11 +11,7 @@ const eventHandler = (io, socket) => {
       const userRef = await usersRef.where("Nickname", "==", data.To).get();
       const user = userRef.docs[0];
 
-      console.log(user.data().socketId);
-
       io.to(user.data().socketId).emit("message", data);
-
-      //socket.emit("message", data);
     } catch (err) {
       console.log(err);
     }
