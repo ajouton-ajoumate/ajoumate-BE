@@ -8,6 +8,8 @@ const main = () => {
   const server = require("http").createServer(app);
   const io = require("socket.io")(server);
 
+  app.use("/", require("./routes"));  
+
   io.on("connection", (socket) => {
     console.log("hello socket");
   });
