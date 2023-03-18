@@ -16,7 +16,7 @@ router.post("/signup", async (req, res, next) => {
     res.send(responseBody);
   } catch (err) {
     console.log(err);
-    res.status(400);
+    res.status(503);
     res.send(err);
   }
 });
@@ -35,13 +35,15 @@ router.post("/signin", async (req, res, next) => {
     response.Status = snapshot.size == 1;
 
     snapshot.forEach(doc => {
+      response.UserID = doc.id;
       response.Nickname = doc.data().Nickname;
+      response.Gender = doc.data().Gender;
     });
 
     res.send(response);
   } catch (err) {
     console.log(err);
-    res.status(400);
+    res.status(503);
     res.send(err);
   }
 });
