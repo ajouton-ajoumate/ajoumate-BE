@@ -67,26 +67,29 @@ router.get("/all", async (req, res, next) => {
   }
 });
 
-router.get("/category/recent", (req, res) => {
+router.get("/category/recent", async (req, res) => {
   try {
     let responseBody = [];
 
-    CATEGORY_TYPE.forEach(async (category) => {
-      const snapshot = await groupsRef
-        .where("Category", "==", category)
-        .orderBy("Date", "desc")
-        .limit(1)
-        .get();
+    const promise = CATEGORY_TYPE.map(async (category) => {
+      const snapshot = await groupsRef.where("Category", "==", category).get();
 
-      if (snapshot.size) {
-        snapshot.forEach((doc) => {
-          let response = doc.data();
-          response.Category = category;
+      let groups = [];
+      snapshot.docs.map((doc) => {
+        let group = doc.data();
+        group.Category = category;
 
-          responseBody.push(response);
-        });
-      }
+        groups.push(group);
+      });
+
+      groups.sort((a, b) => {
+        return a.Date - b.Date;
+      });
+
+      responseBody.push(groups[0]);
     });
+
+    await Promise.all(promise);
 
     res.send(responseBody);
   } catch (err) {
@@ -101,7 +104,16 @@ router.get("/category", async (req, res) => {
     const category = req.query.Category;
     const groups = await groupsRef.where("Category", "==", category).get();
 
-    res.send(groups);
+    let responseBody = [];
+    
+    groups.docs.map((doc)=> {
+        let group = doc.data();
+        group.GroupID = doc.id;
+
+        responseBody.push(group);
+    })
+
+    res.send(responseBody);
   } catch (err) {
     console.log(err);
     res.status(503);
