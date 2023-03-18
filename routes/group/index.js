@@ -6,7 +6,7 @@ const groupsRef = db.collection("group");
 const consistOfRef = db.collection("consistOf");
 const joinsRef = db.collection("join");
 
-const CATEGORY_TYPE = ["TAXI", "EAT", "LOCKER", "ETC"];
+const CATEGORY_TYPE = ["TAXI", "MEAL", "LOCKER", "CAFE", "ETC"];
 
 const createConsistOf = async (GroupID, UserID) => {
   let userArray = [];
@@ -28,11 +28,12 @@ router.post("/new", async (req, res, next) => {
   try {
     let group = req.body;
 
-    const ConsistOfID = await createConsistOf(group.UserID);
-    group.ConsistOfID = ConsistOfID;
-    group.NumberOfPeople = 1;
+    console.log(group);
 
     const addResponse = await groupsRef.add(group);
+    const ConsistOfID = await createConsistOf(addResponse.id, group.UserID);
+    group.ConsistOfID = ConsistOfID;
+    group.NumberOfPeople = 1;
 
     let responseBody = group;
     responseBody.GroupID = addResponse.id;

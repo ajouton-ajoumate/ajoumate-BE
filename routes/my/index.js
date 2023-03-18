@@ -3,33 +3,40 @@ const { getFirestore } = require("firebase-admin/firestore");
 
 const db = getFirestore();
 const joinsRef = db.collection("join");
+const consistOfRef = db.collection("consistOf");
 const groupsRef = db.collection("group");
 const userRef = db.collection("user");
 
 router.get("/", async (req, res) => {
-    try {
-        
-    } catch(err) {
+  try {
+    const userId = req.query.UserID;
 
-    }
+    const user = await userRef.doc(userId).get();
+
+    res.send(user.data());
+  } catch (err) {
+    console.log(err);
+    res.status(503);
+    res.send(err);
+  }
 });
 
 router.post("/join", async (req, res) => {
   try {
-    const UserID = req.body.UserID;
-
-    console.log(req.body, UserID);
+    const UserID = req.query.UserID;
 
     const joinList = await joinsRef.doc(UserID).get();
-    let responseBody = {};
-    responseBody.Groups = [];
 
-    console.log(joinList.data());
+    let responseBody = [];
 
-    // joinList.data()((GroupID) => {
-    //   const group = groupsRef.doc(GroupID).get();
-    //   responseBody.Groups.push(group);
-    // });
+    joinList.data().Groups.forEach(async (GroupID) => {
+        let group = await groupsRef.doc(GroupID).get();
+        const consistOf = await consistOfRef.doc(GroupID).get();
+
+        group.ConsistOf = consistOf;
+
+        responseBody.push(group);
+    })
 
     res.send(responseBody);
   } catch (err) {
