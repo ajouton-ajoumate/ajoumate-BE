@@ -5,16 +5,16 @@ const chatsRef = db.collection("chat");
 const usersRef = db.collection("user");
 const chatRoomRef = db.collection("chatRoom");
 
-const getRoomList = async (UserID) => {
+const getRoomList = async (nickname) => {
   let ret = [];
 
-  const fromSnapshot = await chatRoomRef.where("From", "==", UserID).get();
+  const fromSnapshot = await chatRoomRef.where("From", "==", nickname).get();
 
   fromSnapshot.docs.map((from) => {
     ret.push(from.data().To);
   });
 
-  const toSnapshot = await chatRoomRef.where("To", "==", UserID).get();
+  const toSnapshot = await chatRoomRef.where("To", "==", nickname).get();
 
   toSnapshot.docs.map((to) => {
     ret.push(to.data().From);
@@ -72,6 +72,10 @@ const eventHandler = (io, socket) => {
         responseBody.push(doc.data());
       });
 
+      responseBody.sort((a, b) => {
+        return a.Date - b.Date;
+      });
+
       socket.emit("all message", responseBody);
     } catch (err) {
       console.log(err);
@@ -85,14 +89,20 @@ const eventHandler = (io, socket) => {
       const toUserRef = await usersRef.where("Nickname", "==", to).get();
       const toUser = toUserRef.docs[0];
 
-      const toRoomList = await getRoomList(toUser.id);
+      const toRoomList = await getRoomList(to);
       io.to(toUser.data().socketId).emit("create room", toRoomList);
 
-      const FromUserRef = await usersRef.where("Nickname", "==", from).get();
-      const FromUser = FromUserRef.docs[0];
-
-      const FromRoomList = await getRoomList(FromUser.id);
+      const FromRoomList = await getRoomList(from);
       socket.emit("create room", FromRoomList);
+    } catch (err) {
+      console.log(err);
+    }
+  });
+
+  socket.on("get room list", async (Nickname) => {
+    try {
+      const roomList = await getRoomList(Nickname);
+      socket.emit("get room list", roomList);
     } catch (err) {
       console.log(err);
     }

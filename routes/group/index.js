@@ -27,10 +27,10 @@ const getConsistOf = async (GroupID) => {
 router.post("/new", async (req, res, next) => {
   try {
     let group = req.body;
+    group.NumberOfPeople = 1;
 
     const addResponse = await groupsRef.add(group);
     await createConsistOf(addResponse.id, group.UserID);
-    group.NumberOfPeople = 1;
 
     let responseBody = group;
     responseBody.GroupID = addResponse.id;
@@ -80,7 +80,7 @@ router.get("/category/recent", async (req, res) => {
       });
 
       groups.sort((a, b) => {
-        return a.Date - b.Date;
+        return a.CreatedAt - b.CreatedAt;
       });
 
       responseBody.push(groups[0]);
@@ -121,7 +121,6 @@ router.get("/category", async (req, res) => {
 router.post("/join", async (req, res) => {
   try {
     const { GroupID, UserID } = req.query;
-    console.log(GroupID, UserID);
 
     //numberOfPeople
     const group = await groupsRef.doc(GroupID).get();
@@ -139,7 +138,7 @@ router.post("/join", async (req, res) => {
 
     //join
     const join = await joinsRef.doc(UserID).get();
-    const groups = join.data().Groups;
+    let groups = join.data().Groups;
     groups.push(GroupID);
     await joinsRef.doc(UserID).set({Groups: groups});
 

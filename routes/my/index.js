@@ -43,7 +43,7 @@ router.get("/join", async (req, res) => {
 
     await Promise.all(promise);
 
-    res.send(responseBody);
+    res.send({Groups: responseBody});
   } catch (err) {
     console.log(err);
     res.status(503);
