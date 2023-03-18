@@ -2,9 +2,40 @@ const router = require("express").Router();
 const { getFirestore } = require("firebase-admin/firestore");
 
 const db = getFirestore();
-const usersRef = db.collection("user");
+const groupsRef = db.collection("group");
+const consistOfRef = db.collection("consistOf");
 
-router.post("/new", async (req, res, next) => {});
+const createConsistOf = async (UserID) => {
+    let userArray = [];
+
+    userArray.push(UserID);
+
+    const addResponse = consistOfRef.add(userArray);
+
+    return addResponse.id;
+}
+
+router.post("/new", async (req, res, next) => {
+  try {
+    let group = req.body;
+
+    const ConsistOfID = createConsistOf(group.UserID);
+    group.ConsistOfID = ConsistOfID;
+    group.NumberOfPeople = 1;
+
+    const addResponse = await groupsRef.add(group);
+
+    let responseBody = group;
+    responseBody.GroupID = addResponse.id;
+    responseBody.Status = true;
+
+    res.send(responseBody);
+  } catch (err) {
+    console.log(err);
+    res.status(400);
+    res.send(err);
+  }
+});
 
 router.get("/all", async (req, res, next) => {});
 
