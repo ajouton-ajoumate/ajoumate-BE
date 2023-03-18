@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const { getFirestore } = require('firebase-admin/firestore');
+const { getFirestore } = require("firebase-admin/firestore");
 
 const db = getFirestore();
 const usersRef = db.collection("user");
@@ -9,20 +9,41 @@ router.post("/signup", async (req, res, next) => {
     const user = req.body;
     const addResponse = await usersRef.add(user);
 
-    console.log("Added document with ID: ", addResponse.id);
-
     let responseBody = user;
-    responseBody.userID = addResponse.id;
+    responseBody.UserID = addResponse.id;
+    responseBody.Status = true;
 
     res.send(responseBody);
   } catch (err) {
     console.log(err);
+    res.status(400);
     res.send(err);
   }
 });
 
 router.post("/signin", async (req, res, next) => {
+  try {
+    const { ID, Password } = req.body;
 
+    const snapshot = await usersRef
+      .where("ID", "==", ID)
+      .where("Password", "==", Password)
+      .get();
+
+    let response = {};
+
+    response.Status = snapshot.size == 1;
+
+    snapshot.forEach(doc => {
+      response.Nickname = doc.data().Nickname;
+    });
+
+    res.send(response);
+  } catch (err) {
+    console.log(err);
+    res.status(400);
+    res.send(err);
+  }
 });
 
 router.post("/checkDuplicateID", async (req, res) => {
@@ -33,15 +54,30 @@ router.post("/checkDuplicateID", async (req, res) => {
 
     let response = {};
 
-    response.Status = userRef.empty
+    response.Status = userRef.empty;
 
     res.send(response);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.send(err);
   }
 });
 
-router.post("/checkDuplicateName", async (req, res, next) => {});
+router.post("/checkDuplicateName", async (req, res) => {
+  try {
+    const nickname = req.body.Nickname;
+
+    const userRef = await usersRef.where("Nickname", "==", nickname).get();
+
+    let response = {};
+
+    response.Status = userRef.empty;
+
+    res.send(response);
+  } catch (err) {
+    console.log(err);
+    res.send(err);
+  }
+});
 
 module.exports = router;

@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const serviceAccount = require("./path/to/serviceAccountKey.json");
 const { initializeApp, cert } = require("firebase-admin/app");
+const cors = require("cors");
 
 const main = () => {
   const app = express();
@@ -19,6 +20,7 @@ const main = () => {
     })
   );
   app.use(express.json());
+  app.use(cors());
 
   app.use("/auth", require("./routes/auth"));
 
