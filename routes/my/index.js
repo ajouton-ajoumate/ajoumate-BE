@@ -6,7 +6,13 @@ const joinsRef = db.collection("join");
 const groupsRef = db.collection("group");
 const userRef = db.collection("user");
 
-router.get("/", async (req, res) => {});
+router.get("/", async (req, res) => {
+    try {
+        
+    } catch(err) {
+
+    }
+});
 
 router.post("/join", async (req, res) => {
   try {

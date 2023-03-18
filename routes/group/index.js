@@ -97,7 +97,7 @@ router.get("/category/recent", (req, res) => {
 
 router.get("/category", async (req, res) => {
   try {
-    const category = req.params.Category;
+    const category = req.query.Category;
     const groups = await groupsRef.where("Category", "==", category).get();
 
     res.send(groups);
@@ -110,7 +110,7 @@ router.get("/category", async (req, res) => {
 
 router.post("/join", async (req, res) => {
   try {
-    const { GroupID, UserID } = req.params;
+    const { GroupID, UserID } = req.query;
 
     //numberOfPeople
     const group = await groupsRef.doc(GroupID).get();
@@ -142,7 +142,7 @@ router.post("/join", async (req, res) => {
 
 router.delete("/", async (req, res) => {
   try {
-    const { GroupID } = req.params;
+    const { GroupID } = req.query;
 
     await groupsRef.doc(GroupID).delete();
     res.send({ Status: true });
@@ -155,7 +155,7 @@ router.delete("/", async (req, res) => {
 
 router.get("/", async (req, res) => {
   try {
-    const { GroupID } = req.params;
+    const { GroupID } = req.query;
 
     const group = await groupsRef.doc(GroupID).get();
 
