@@ -1,5 +1,4 @@
 const express = require("express");
-const bodyParser = require("body-parser");
 const serviceAccount = require("./path/to/serviceAccountKey.json");
 const { initializeApp, cert } = require("firebase-admin/app");
 const cors = require("cors");
@@ -26,6 +25,7 @@ const main = () => {
 
   io.on("connection", (socket) => {
     console.log("hello socket");
+    require("./routes/chat")(io, socket);
   });
 
   server.listen(PORT, () => {

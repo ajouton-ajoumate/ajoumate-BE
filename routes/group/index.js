@@ -10,7 +10,7 @@ const createConsistOf = async (UserID) => {
 
   userArray.push(UserID);
 
-  const addResponse = consistOfRef.add(userArray);
+  const addResponse = await consistOfRef.add({ Users: userArray });
 
   return addResponse.id;
 };
@@ -19,7 +19,7 @@ router.post("/new", async (req, res, next) => {
   try {
     let group = req.body;
 
-    const ConsistOfID = createConsistOf(group.UserID);
+    const ConsistOfID = await createConsistOf(group.UserID);
     group.ConsistOfID = ConsistOfID;
     group.NumberOfPeople = 1;
 
