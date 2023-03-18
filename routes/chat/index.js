@@ -8,13 +8,14 @@ const eventHandler = (io, socket) => {
   socket.on("message", async (data) => {
     try {
       await chatsRef.add(data);
-      const userRef = await usersRef.doc(data.To).get();
+      const userRef = await usersRef.where("Nickname", "==", data.To).get();
+      const user = userRef.docs[0];
 
-      console.log(userRef.data().socketId);
+      console.log(user.data().socketId);
 
-      socket.to(userRef.data().socketId).emit("message", data);
+      io.to(user.data().socketId).emit("message", data);
 
-      // socket.emit("message", data);
+      //socket.emit("message", data);
     } catch (err) {
       console.log(err);
     }

@@ -4,6 +4,7 @@ const { getFirestore } = require("firebase-admin/firestore");
 const db = getFirestore();
 const groupsRef = db.collection("group");
 const consistOfRef = db.collection("consistOf");
+const joinsRef = db.collection("join"); 
 
 const CATEGORY_TYPE = ["TAXI", "EAT", "LOCKER", "ETC"];
 
@@ -107,7 +108,36 @@ router.get("/category", async (req, res) => {
   }
 });
 
-router.post("/join", async (req, res) => {});
+router.post("/join", async (req, res) => {
+  try {
+    const {GroupID, UserID} = req.params;
+
+    //numberOfPeople
+    const group = await groupsRef.doc(GroupID).get();
+    const groupData = group.data();
+    if (groupData.NumberOfPeople === groupData.MaximumNumberOfPeople) {
+      throw new Error("group is full");
+    }
+    groupData.NumberOfPeople++;
+    await groupsRef.doc(GroupID).set(groupData);
+
+    //consistOf
+    let users = await getConsistOf(GroupID);
+    users.push(UserID);
+    await consistOfRef.doc(GroupID).set(users);
+
+    //join
+    const join = await joinsRef.doc(UserID).get();
+    const groups = join.data().Groups;
+    groups.push(GroupID);
+    await joinsRef.doc(UserID).set(groups);
+
+  } catch (err) {
+    console.log(err);
+    res.status(503);
+    res.send(err);
+  }
+});
 
 router.delete("/", async (req, res) => {});
 
