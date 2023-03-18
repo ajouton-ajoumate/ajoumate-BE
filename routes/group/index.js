@@ -121,6 +121,7 @@ router.get("/category", async (req, res) => {
 router.post("/join", async (req, res) => {
   try {
     const { GroupID, UserID } = req.query;
+    console.log(GroupID, UserID);
 
     //numberOfPeople
     const group = await groupsRef.doc(GroupID).get();

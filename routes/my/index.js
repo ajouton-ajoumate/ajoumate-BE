@@ -32,9 +32,11 @@ router.get("/join", async (req, res) => {
     groups = joinList.data().Groups.slice(1);
 
     const promise = groups.map(async (GroupID) => {
-      let group = await groupsRef.doc(GroupID).get();
+      const groupSnapshot = await groupsRef.doc(GroupID).get();
       //   const consistOf = await consistOfRef.doc(GroupID).get();
       //   group.ConsistOf = consistOf;
+      let group = groupSnapshot.data();
+      group.GroupID = GroupID;
 
       responseBody.push(group);
     });
