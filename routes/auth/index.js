@@ -3,6 +3,7 @@ const { getFirestore } = require("firebase-admin/firestore");
 
 const db = getFirestore();
 const usersRef = db.collection("user");
+const joinsRef = db.collection("join");
 
 router.post("/signup", async (req, res, next) => {
   try {
@@ -13,9 +14,11 @@ router.post("/signup", async (req, res, next) => {
     responseBody.UserID = addResponse.id;
     responseBody.Status = true;
 
+    await joinsRef.doc(addResponse.id).set({Groups: [""]});
+
     res.send(responseBody);
   } catch (err) {
-    console.log(err);
+    console.log("signup", err.message);
     res.status(503);
     res.send(err);
   }

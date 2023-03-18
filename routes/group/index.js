@@ -28,11 +28,8 @@ router.post("/new", async (req, res, next) => {
   try {
     let group = req.body;
 
-    console.log(group);
-
     const addResponse = await groupsRef.add(group);
-    const ConsistOfID = await createConsistOf(addResponse.id, group.UserID);
-    group.ConsistOfID = ConsistOfID;
+    await createConsistOf(addResponse.id, group.UserID);
     group.NumberOfPeople = 1;
 
     let responseBody = group;
@@ -137,13 +134,13 @@ router.post("/join", async (req, res) => {
     //consistOf
     let users = await getConsistOf(GroupID);
     users.push(UserID);
-    await consistOfRef.doc(GroupID).set(users);
+    await consistOfRef.doc(GroupID).set({Users: users});
 
     //join
     const join = await joinsRef.doc(UserID).get();
     const groups = join.data().Groups;
     groups.push(GroupID);
-    await joinsRef.doc(UserID).set(groups);
+    await joinsRef.doc(UserID).set({Groups: groups});
 
     res.send({ Status: true });
   } catch (err) {

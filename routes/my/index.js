@@ -21,7 +21,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.post("/join", async (req, res) => {
+router.get("/join", async (req, res) => {
   try {
     const UserID = req.query.UserID;
 
@@ -29,14 +29,17 @@ router.post("/join", async (req, res) => {
 
     let responseBody = [];
 
-    joinList.data().Groups.forEach(async (GroupID) => {
-      let group = await groupsRef.doc(GroupID).get();
-      const consistOf = await consistOfRef.doc(GroupID).get();
+    groups = joinList.data().Groups.slice(1);
 
-      group.ConsistOf = consistOf;
+    const promise = groups.map(async (GroupID) => {
+      let group = await groupsRef.doc(GroupID).get();
+      //   const consistOf = await consistOfRef.doc(GroupID).get();
+      //   group.ConsistOf = consistOf;
 
       responseBody.push(group);
     });
+
+    await Promise.all(promise);
 
     res.send(responseBody);
   } catch (err) {
@@ -52,17 +55,11 @@ router.get("/apply", async (req, res) => {
 
     const applyList = await groupsRef.where("UserID", "==", UserID).get();
 
-    applyList.docs.map()
-
-    const joinList = await joinsRef.doc(UserID).get();
-
     let responseBody = [];
 
-    joinList.data().Groups.forEach(async (GroupID) => {
-      let group = await groupsRef.doc(GroupID).get();
-      const consistOf = await consistOfRef.doc(GroupID).get();
-
-      group.ConsistOf = consistOf;
+    applyList.docs.map((doc) => {
+      let group = doc.data();
+      group.GroupID = doc.id;
 
       responseBody.push(group);
     });

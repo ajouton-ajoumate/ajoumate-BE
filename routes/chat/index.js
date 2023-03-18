@@ -32,6 +32,14 @@ const eventHandler = (io, socket) => {
       console.log(err);
     }
   });
+
+  socket.on("all message", async () => {
+    
+  })
+
+  socket.on("create room", () => {
+    
+  })
 };
 
 module.exports = eventHandler;
