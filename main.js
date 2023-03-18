@@ -24,7 +24,6 @@ const main = () => {
   app.use("/", require("./routes"));
 
   io.on("connection", (socket) => {
-    console.log("hello socket");
     require("./routes/chat")(io, socket);
   });
 

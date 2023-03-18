@@ -12,6 +12,8 @@ const eventHandler = (io, socket) => {
       const user = userRef.docs[0];
 
       io.to(user.data().socketId).emit("message", data);
+
+      socket.emit("message", data);
     } catch (err) {
       console.log(err);
     }
