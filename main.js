@@ -22,7 +22,7 @@ const main = () => {
   app.use(express.json());
   app.use(cors());
 
-  app.use("/auth", require("./routes/auth"));
+  app.use("/", require("./routes"));
 
   io.on("connection", (socket) => {
     console.log("hello socket");
