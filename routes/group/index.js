@@ -6,14 +6,14 @@ const groupsRef = db.collection("group");
 const consistOfRef = db.collection("consistOf");
 
 const createConsistOf = async (UserID) => {
-    let userArray = [];
+  let userArray = [];
 
-    userArray.push(UserID);
+  userArray.push(UserID);
 
-    const addResponse = consistOfRef.add(userArray);
+  const addResponse = consistOfRef.add(userArray);
 
-    return addResponse.id;
-}
+  return addResponse.id;
+};
 
 router.post("/new", async (req, res, next) => {
   try {
@@ -37,7 +37,25 @@ router.post("/new", async (req, res, next) => {
   }
 });
 
-router.get("/all", async (req, res, next) => {});
+router.get("/all", async (req, res, next) => {
+  try {
+    const snapshot = await groupsRef.get();
+    let responseBody = [];
+
+    snapshot.forEach((doc) => {
+      let response = doc.data();
+      response.GroupID = doc.id;
+
+      responseBody.push(response);
+    });
+
+    res.send(responseBody);
+  } catch (err) {
+    console.log(err);
+    res.status(400);
+    res.send(err);
+  }
+});
 
 router.get("/category/recent", async (req, res) => {});
 
