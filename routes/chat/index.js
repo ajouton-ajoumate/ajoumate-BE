@@ -6,22 +6,32 @@ const usersRef = db.collection("user");
 
 const eventHandler = (io, socket) => {
   socket.on("message", async (data) => {
-    console.log(data);
-    await chatsRef.add(data);
-    const userRef = await usersRef.doc(data.To).get();
+    try {
+      await chatsRef.add(data);
+      const userRef = await usersRef.doc(data.To).get();
 
-    socket.emit("message", data);
+      console.log(userRef.data().socketId);
+
+      socket.to(userRef.data().socketId).emit("message", data);
+
+      // socket.emit("message", data);
+    } catch (err) {
+      console.log(err);
+    }
   });
 
   socket.on("set socketId", async (userId) => {
-    console.log(userId);
+    try {
+      const userRef = await usersRef.doc(userId).get();
 
-    const userRef = await usersRef.doc(userId).get();
+      let user = userRef.data();
 
-    let user = userRef.data();
-    user.socketId = socket.id;
+      user.socketId = socket.id;
 
-    await usersRef.doc(userId).set(user);
+      await usersRef.doc(userId).set(user);
+    } catch (err) {
+      console.log(err);
+    }
   });
 };
 

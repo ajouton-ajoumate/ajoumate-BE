@@ -28,7 +28,7 @@ router.post("/join", async (req, res) => {
     res.send(responseBody);
   } catch (err) {
     console.log(err);
-    res.status(404);
+    res.status(503);
     res.send(err);
   }
 });
